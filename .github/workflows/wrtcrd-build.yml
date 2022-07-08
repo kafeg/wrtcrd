@@ -19,14 +19,24 @@ jobs:
           go build -tags "h264enc" cmd/main.go
           mv main wrtcrd
           ls -alh
-      - if: matrix.os == 'windows-latest'
-        run: |
-          echo "Windows"
-          go build -tags "h264enc" cmd/main.go
-          mv main wrtcrd
       - if: matrix.os == 'macos-latest'
         run: |
           echo "macOS"
           go build -tags "h264enc" cmd/main.go
           mv main wrtcrd
           ls -alh
+      - if: matrix.os == 'windows-latest'
+        run: |
+          echo "Windows"
+          go build -tags "h264enc" cmd/main.go
+          mv main.exe wrtcrd.exe
+  artifacts:
+    name: Upload Artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload the artifacts
+        uses: skx/github-action-publish-binaries@release-1.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.WRTCRD_TOKEN }}
+        with:
+          args: 'wrtcrd*'
