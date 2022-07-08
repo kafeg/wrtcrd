@@ -43,9 +43,10 @@ jobs:
           mv main.exe wrtcrd.exe
       - if: github.event_name != 'push' && matrix.os == 'ubuntu-latest'
         run: |
+          set -x
           FILE=wrtcrd
           ASSET=wrtcrd-x64-linux
-          curl -H "Authorization: token $WRTCRD_TOKEN" -H "Content-Type: $(file -b --mime-type $FILE)" --data-binary @$FILE \
+          curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $FILE)" --data-binary @$FILE \
               "https://uploads.github.com/repos/kafeg/wrtcrd/releases/$GITHUB_REF_NAME/assets?name=$(basename $ASSET)"
 #        uses: svenstaro/upload-release-action@v2
 #        with:
