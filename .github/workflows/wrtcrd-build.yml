@@ -8,16 +8,25 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get install -y libxtst-dev
-      - if: matrix.os == 'windows-latest'
-        run: echo "Windows"
-      - if: matrix.os == 'macos-latest'
-        run: echo "macOS"
       - uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go-version }}
       - uses: actions/checkout@v3
-      - run: |
+      - if: matrix.os == 'ubuntu-latest'
+        run: |
+          echo "Linux"
+          sudo apt-get install -y libxtst-dev
           go build -tags "h264enc" cmd/main.go
           mv main wrtcrd
+          ls -alh
+      - if: matrix.os == 'windows-latest'
+        run: |
+          echo "Windows"
+          go build -tags "h264enc" cmd/main.go
+          mv main wrtcrd
+      - if: matrix.os == 'macos-latest'
+        run: |
+          echo "macOS"
+          go build -tags "h264enc" cmd/main.go
+          mv main wrtcrd
+          ls -alh
