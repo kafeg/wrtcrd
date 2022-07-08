@@ -21,4 +21,3 @@ jobs:
       - run: |
           go build -tags "h264enc" cmd/main.go
           mv main wrtcrd
-          ls -alh
