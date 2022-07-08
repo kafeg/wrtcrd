@@ -1,4 +1,7 @@
-on: [push, pull_request]
+on:
+  push:
+  release:
+    types: [ created ]
 name: Build wrtcrd
 jobs:
   build-wrtcrd:
