@@ -17,6 +17,12 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
       - uses: actions/checkout@v3
+      - name: Dump env
+        run: env | sort
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
       - if: matrix.os == 'ubuntu-latest'
         run: |
           echo "Linux"
@@ -36,23 +42,28 @@ jobs:
           go build -tags "h264enc" cmd/main.go
           mv main.exe wrtcrd.exe
       - if: github.event_name != 'push' && matrix.os == 'ubuntu-latest'
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.WRTCRD_TOKEN }}
-          file: wrtcrd
-          asset_name: wrtcrd-x64-linux
-          tag: ${{ github.ref }}
-      - if: github.event_name != 'push' && matrix.os == 'macos-latest'
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.WRTCRD_TOKEN }}
-          file: wrtcrd
-          asset_name: wrtcrd-x64-osx
-          tag: ${{ github.ref }}
-      - if: github.event_name != 'push' && matrix.os == 'windows-latest'
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.WRTCRD_TOKEN }}
-          file: wrtcrd.exe
-          asset_name: wrtcrd-x64-windows.exe
-          tag: ${{ github.ref }}
+        run: |
+          FILE=wrtcrd
+          ASSET=wrtcrd-x64-linux
+          curl -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: $(file -b --mime-type $FILE)" --data-binary @$FILE \
+              "https://uploads.github.com/repos/hubot/singularity/releases/123/assets?name=$(basename $ASSET)"
+#        uses: svenstaro/upload-release-action@v2
+#        with:
+#          repo_token: ${{ secrets.WRTCRD_TOKEN }}
+#          file: wrtcrd
+#          asset_name: wrtcrd-x64-linux
+#          tag: ${{ github.ref }}
+#      - if: github.event_name != 'push' && matrix.os == 'macos-latest'
+#        uses: svenstaro/upload-release-action@v2
+#        with:
+#          repo_token: ${{ secrets.WRTCRD_TOKEN }}
+#          file: wrtcrd
+#          asset_name: wrtcrd-x64-osx
+#          tag: ${{ github.ref }}
+#      - if: github.event_name != 'push' && matrix.os == 'windows-latest'
+#        uses: svenstaro/upload-release-action@v2
+#        with:
+#          repo_token: ${{ secrets.WRTCRD_TOKEN }}
+#          file: wrtcrd.exe
+#          asset_name: wrtcrd-x64-windows.exe
+#          tag: ${{ github.ref }}
