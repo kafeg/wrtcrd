@@ -1,5 +1,5 @@
 on:
-  push:
+  #push:
   release:
     types: [ created ]
 name: Build wrtcrd
@@ -33,7 +33,8 @@ jobs:
           echo "Windows"
           go build -tags "h264enc" cmd/main.go
           mv main.exe wrtcrd.exe
-      - uses: skx/github-action-publish-binaries@release-1.3
+      - if: github.event_name != 'push'
+        uses: skx/github-action-publish-binaries@release-1.3
         env:
           GITHUB_TOKEN: ${{ secrets.WRTCRD_TOKEN }}
         with:
