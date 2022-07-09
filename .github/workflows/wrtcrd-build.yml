@@ -37,7 +37,7 @@ jobs:
                     "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
           fi
           rm -f wrtcrd
-          GOOS=linux GOARCH=386 go build -tags "h264enc" -o wrtcrd cmd/main.go
+          GOOS=linux GOARCH=386 CGO_ENABLED=1 go build -tags "h264enc" -o wrtcrd cmd/main.go
           if [ "$GITHUB_EVENT_NAME" == "release" ]; then
             ASSET=wrtcrd-x86-linux.zip
             7za a -tzip $ASSET wrtcrd
