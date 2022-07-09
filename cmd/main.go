@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 // Most useful article describes WebRTC p2p magic
@@ -21,6 +22,7 @@ const (
 	defaultStunServer  = "stun:stun.l.google.com:19302"
 	defaultInFileName  = "wrtcrd-in.dat"
 	defaultOutFileName = "wrtcrd-out.dat"
+	defaultLogFileName = "wrtcrd.log"
 )
 
 type InputFileData struct {
@@ -54,14 +56,27 @@ func main() {
 	stunServer := flag.String("stun", defaultStunServer, "STUN server URL (stun:)")
 	inFileName := flag.String("in", defaultInFileName, "Input data filename (in:)")
 	outFileName := flag.String("out", defaultOutFileName, "Output data filename (out:)")
+	logFileName := flag.String("log", defaultLogFileName, "Log filename (log:)")
 	flag.Parse()
 
-	fmt.Printf("Stun: %s, In: %s, Out: %s\n", *stunServer, *inFileName, *outFileName)
-	fmt.Println("Init video provider and encoders")
+	// setup log output to log file
+	f, err := os.OpenFile(*logFileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	defer f.Close()
+
+	log.Printf("Log to: %s\n", *logFileName)
+	log.SetOutput(f)
+
+	dt := time.Now()
+	log.Println("")
+	log.Printf("Started: %s, Stun: %s, In: %s, Out: %s\n", dt.String(), *stunServer, *inFileName, *outFileName)
+	log.Println("Init video provider and encoders")
 
 	// setup major services
 	var video rdisplay.ServiceInterface
-	video, err := rdisplay.NewVideoProvider()
+	video, err = rdisplay.NewVideoProvider()
 	if err != nil {
 		log.Fatalf("Can't init video: %v", err)
 	}
@@ -75,13 +90,13 @@ func main() {
 	}
 
 	// parse input file
-	fmt.Println("Read input data")
+	log.Println("Read input data")
 	inputData, err := readInputFile(*inFileName)
 	if err != nil {
 		log.Fatalf("Can't open input file: %v", err)
 	}
 
-	fmt.Println("Process WebRTC offer")
+	log.Println("Process WebRTC offer")
 	var webrtc rtc.Service
 	webrtc = rtc.NewRemoteScreenService(*stunServer, video, enc)
 
@@ -97,7 +112,7 @@ func main() {
 		log.Fatalf("Can't process offer: %v", err)
 	}
 
-	fmt.Println("Write output data")
+	log.Println("Write output data")
 	outputData, err := json.Marshal(OutputFileData{
 		Answer: answer,
 	})
@@ -115,7 +130,7 @@ func main() {
 	// here we already have webrtc which is trying to connect using our OFFER in IN file
 	// and we need to send ANSWER back to the CALLER somehow
 
-	fmt.Println("Waiting...")
+	log.Println("Waiting...")
 	errors := make(chan error, 2)
 
 	go func() {

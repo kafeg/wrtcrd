@@ -1,8 +1,8 @@
 package rtc
 
 import (
-	"fmt"
 	"image"
+	"log"
 
 	"github.com/kafeg/wrtc-rd-agent/internal/encoders"
 	"github.com/kafeg/wrtc-rd-agent/internal/rdisplay"
@@ -49,7 +49,7 @@ func (s *rtcStreamer) startStream() {
 		case frame := <-frames:
 			err := s.stream(frame)
 			if err != nil {
-				fmt.Printf("Streamer: %v\n", err)
+				log.Printf("Streamer: %v\n", err)
 				return
 			}
 		}
