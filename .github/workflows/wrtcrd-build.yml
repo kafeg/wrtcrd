@@ -62,6 +62,7 @@ jobs:
           curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $FILE)" --data-binary @$FILE \
               "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
       - name: Upload Windows artifacts
+        shell: bash
         if: github.event_name == 'release' && matrix.os == 'windows-latest'
         run: |
           FILE=wrtcrd.exe
