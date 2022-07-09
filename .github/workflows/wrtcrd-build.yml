@@ -55,12 +55,22 @@ jobs:
         shell: bash
         if: matrix.os == 'windows-latest'
         run: |
+          # x64
           echo "Windows"
-          go build -tags "h264enc" cmd/main.go
+          GOARCH=amd64 go build -tags "h264enc" cmd/main.go
           if [ "$GITHUB_EVENT_NAME" == "release" ]; then
-            set -x
             mv main.exe wrtcrd.exe
             ASSET=wrtcrd-x64-windows.zip
+            7z a -tzip $ASSET wrtcrd.exe
+            curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $ASSET)" --data-binary @$ASSET \
+              "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
+          fi
+          # x86
+          rm -f wrtcrd.exe
+          GOARCH=386 go build -tags "h264enc" cmd/main.go
+          if [ "$GITHUB_EVENT_NAME" == "release" ]; then
+            mv main.exe wrtcrd.exe
+            ASSET=wrtcrd-x86-windows.zip
             7z a -tzip $ASSET wrtcrd.exe
             curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $ASSET)" --data-binary @$ASSET \
               "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
