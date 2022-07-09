@@ -27,7 +27,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           echo "Linux"
-          sudo apt-get install -y libxtst-dev
+          sudo apt-get install -y libxtst-dev p7zip-full
           go build -tags "h264enc" cmd/main.go
           mv main wrtcrd
           ls -alh
@@ -49,23 +49,26 @@ jobs:
         run: |
           set -x
           FILE=wrtcrd
-          ASSET=wrtcrd-x64-linux
+          ASSET=wrtcrd-x64-linux.zip
+          7za a -tzip $ASSET $FILE
           # Token should have permission repo -> public_repo (https://stackoverflow.com/a/37632339)
-          curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $FILE)" --data-binary @$FILE \
+          curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $ASSET)" --data-binary @$ASSET \
               "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
       - name: Upload macOS artifacts
         if: github.event_name == 'release' && matrix.os == 'macos-latest'
         run: |
           set -x
           FILE=wrtcrd
-          ASSET=wrtcrd-x64-osx
-          curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $FILE)" --data-binary @$FILE \
+          ASSET=wrtcrd-x64-osx.zip
+          7za a -tzip $ASSET $FILE
+          curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $ASSET)" --data-binary @$ASSET \
               "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
       - name: Upload Windows artifacts
         shell: bash
         if: github.event_name == 'release' && matrix.os == 'windows-latest'
         run: |
           FILE=wrtcrd.exe
-          ASSET=wrtcrd-x64-windows.exe
-          curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $FILE)" --data-binary @$FILE \
+          ASSET=wrtcrd-x64-windows.zip
+          7z a -tzip $ASSET $FILE
+          curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $ASSET)" --data-binary @$ASSET \
               "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
