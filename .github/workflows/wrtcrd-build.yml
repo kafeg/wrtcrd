@@ -28,11 +28,18 @@ jobs:
         run: |
           echo "Linux"
           sudo apt-get install -y libxtst-dev p7zip-full
-          go build -tags "h264enc" cmd/main.go
+          GOOS=linux GOARCH=amd64 go build -tags "h264enc" -o wrtcrd cmd/main.go
           if [ "$GITHUB_EVENT_NAME" == "release" ]; then
-            set -x
-            mv main wrtcrd
             ASSET=wrtcrd-x64-linux.zip
+            7za a -tzip $ASSET wrtcrd
+            # Token should have permission repo -> public_repo (https://stackoverflow.com/a/37632339)
+            curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $ASSET)" --data-binary @$ASSET \
+                    "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
+          fi
+          rm -f wrtcrd
+          GOOS=linux GOARCH=386 go build -tags "h264enc" -o wrtcrd cmd/main.go
+          if [ "$GITHUB_EVENT_NAME" == "release" ]; then
+            ASSET=wrtcrd-x86-linux.zip
             7za a -tzip $ASSET wrtcrd
             # Token should have permission repo -> public_repo (https://stackoverflow.com/a/37632339)
             curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $ASSET)" --data-binary @$ASSET \
@@ -42,11 +49,17 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           echo "macOS"
-          go build -tags "h264enc" cmd/main.go
+          GOOS=darwin GOARCH=amd64 go build -tags "h264enc" -o wrtcrd cmd/main.go
           if [ "$GITHUB_EVENT_NAME" == "release" ]; then
-            set -x
-            mv main wrtcrd
             ASSET=wrtcrd-x64-osx.zip
+            7za a -tzip $ASSET wrtcrd
+            curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $ASSET)" --data-binary @$ASSET \
+              "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
+          fi
+          rm -f wrtcrd
+          GOOS=darwin GOARCH=arm64 go build -tags "h264enc" -o wrtcrd cmd/main.go
+          if [ "$GITHUB_EVENT_NAME" == "release" ]; then
+            ASSET=wrtcrd-arm64-osx.zip
             7za a -tzip $ASSET wrtcrd
             curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $ASSET)" --data-binary @$ASSET \
               "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
@@ -57,9 +70,8 @@ jobs:
         run: |
           # x64
           echo "Windows"
-          GOARCH=amd64 go build -tags "h264enc" cmd/main.go
+          GOOS=windows GOARCH=amd64 go build -tags "h264enc" -o wrtcrd.exe cmd/main.go
           if [ "$GITHUB_EVENT_NAME" == "release" ]; then
-            mv main.exe wrtcrd.exe
             ASSET=wrtcrd-x64-windows.zip
             7z a -tzip $ASSET wrtcrd.exe
             curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $ASSET)" --data-binary @$ASSET \
@@ -67,9 +79,8 @@ jobs:
           fi
           # x86
           rm -f wrtcrd.exe
-          GOARCH=386 go build -tags "h264enc" cmd/main.go
+          GOOS=windows GOARCH=386 CGO_ENABLED=1 go build -tags "h264enc" -o wrtcrd.exe cmd/main.go
           if [ "$GITHUB_EVENT_NAME" == "release" ]; then
-            mv main.exe wrtcrd.exe
             ASSET=wrtcrd-x86-windows.zip
             7z a -tzip $ASSET wrtcrd.exe
             curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $ASSET)" --data-binary @$ASSET \
