@@ -27,7 +27,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           echo "Linux"
-          sudo apt-get install -y libxtst-dev p7zip-full
+          sudo apt-get install -y libxtst-dev p7zip-full gcc-multilib g++-multilib
           GOOS=linux GOARCH=amd64 go build -tags "h264enc" -o wrtcrd cmd/main.go
           if [ "$GITHUB_EVENT_NAME" == "release" ]; then
             ASSET=wrtcrd-x64-linux.zip
@@ -57,7 +57,7 @@ jobs:
               "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
           fi
           rm -f wrtcrd
-          GOOS=darwin GOARCH=arm64 go build -tags "h264enc" -o wrtcrd cmd/main.go
+          GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -tags "h264enc" -o wrtcrd cmd/main.go
           if [ "$GITHUB_EVENT_NAME" == "release" ]; then
             ASSET=wrtcrd-arm64-osx.zip
             7za a -tzip $ASSET wrtcrd
