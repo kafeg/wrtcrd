@@ -23,48 +23,49 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - if: matrix.os == 'ubuntu-latest'
+      - name: Build for Linux
+        if: matrix.os == 'ubuntu-latest'
         run: |
           echo "Linux"
           sudo apt-get install -y libxtst-dev
           go build -tags "h264enc" cmd/main.go
           mv main wrtcrd
           ls -alh
-      - if: matrix.os == 'macos-latest'
+      - name: Build for macOS
+        if: matrix.os == 'macos-latest'
         run: |
           echo "macOS"
           go build -tags "h264enc" cmd/main.go
           mv main wrtcrd
           ls -alh
-      - if: matrix.os == 'windows-latest'
+      - name: Build for Windows
+        if: matrix.os == 'windows-latest'
         run: |
           echo "Windows"
           go build -tags "h264enc" cmd/main.go
           mv main.exe wrtcrd.exe
-      - if: github.event_name != 'push' && matrix.os == 'ubuntu-latest'
+      - name: Upload Linux artifacts
+        if: github.event_name == 'release' && matrix.os == 'ubuntu-latest'
         run: |
           set -x
           FILE=wrtcrd
           ASSET=wrtcrd-x64-linux
+          # Token should have permission repo -> public_repo (https://stackoverflow.com/a/37632339)
           curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $FILE)" --data-binary @$FILE \
               "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
-#        uses: svenstaro/upload-release-action@v2
-#        with:
-#          repo_token: ${{ secrets.WRTCRD_TOKEN }}
-#          file: wrtcrd
-#          asset_name: wrtcrd-x64-linux
-#          tag: ${{ github.ref }}
-#      - if: github.event_name != 'push' && matrix.os == 'macos-latest'
-#        uses: svenstaro/upload-release-action@v2
-#        with:
-#          repo_token: ${{ secrets.WRTCRD_TOKEN }}
-#          file: wrtcrd
-#          asset_name: wrtcrd-x64-osx
-#          tag: ${{ github.ref }}
-#      - if: github.event_name != 'push' && matrix.os == 'windows-latest'
-#        uses: svenstaro/upload-release-action@v2
-#        with:
-#          repo_token: ${{ secrets.WRTCRD_TOKEN }}
-#          file: wrtcrd.exe
-#          asset_name: wrtcrd-x64-windows.exe
-#          tag: ${{ github.ref }}
+      - name: Upload macOS artifacts
+        if: github.event_name == 'release' && matrix.os == 'macos-latest'
+        run: |
+          set -x
+          FILE=wrtcrd
+          ASSET=wrtcrd-x64-osx
+          curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $FILE)" --data-binary @$FILE \
+              "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
+      - name: Upload Windows artifacts
+        if: github.event_name == 'release' && matrix.os == 'windows-latest'
+        run: |
+          set -x
+          FILE=wrtcrd.exe
+          ASSET=wrtcrd-x64-osx.exe
+          curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $FILE)" --data-binary @$FILE \
+              "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
