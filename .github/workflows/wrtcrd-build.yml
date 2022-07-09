@@ -64,7 +64,6 @@ jobs:
       - name: Upload Windows artifacts
         if: github.event_name == 'release' && matrix.os == 'windows-latest'
         run: |
-          set -x
           FILE=wrtcrd.exe
           ASSET=wrtcrd-x64-osx.exe
           curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $FILE)" --data-binary @$FILE \
