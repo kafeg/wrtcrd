@@ -77,14 +77,14 @@ jobs:
             curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $ASSET)" --data-binary @$ASSET \
               "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
           fi
-          # x86
-          rm -f wrtcrd.exe
-          echo "C:\msys64\mingw32\bin" >> $GITHUB_PATH
-          export PATH="/c/programdata/chocolatey/lib/mingw/tools/install/mingw32/bin:$PATH"
-          GOOS=windows GOARCH=386 CGO_ENABLED=1 go build -tags "h264enc" -o wrtcrd.exe cmd/main.go
-          if [ "$GITHUB_EVENT_NAME" == "release" ]; then
-            ASSET=wrtcrd-x86-windows.zip
-            7z a -tzip $ASSET wrtcrd.exe
-            curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $ASSET)" --data-binary @$ASSET \
-              "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
-          fi
+#          # x86
+#          rm -f wrtcrd.exe
+#          echo "C:\msys64\mingw32\bin" >> $GITHUB_PATH
+#          export PATH="/c/programdata/chocolatey/lib/mingw/tools/install/mingw32/bin:$PATH"
+#          GOOS=windows GOARCH=386 CGO_ENABLED=1 go build -tags "h264enc" -o wrtcrd.exe cmd/main.go
+#          if [ "$GITHUB_EVENT_NAME" == "release" ]; then
+#            ASSET=wrtcrd-x86-windows.zip
+#            7z a -tzip $ASSET wrtcrd.exe
+#            curl -H "Authorization: token ${{ secrets.WRTCRD_TOKEN }}" -H "Content-Type: $(file -b --mime-type $ASSET)" --data-binary @$ASSET \
+#              "https://uploads.github.com/repos/kafeg/wrtcrd/releases/${{ github.event.release.id }}/assets?name=$(basename $ASSET)"
+#          fi
