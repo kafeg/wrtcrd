@@ -44,6 +44,7 @@ jobs:
           echo "macOS"
           go build -tags "h264enc" cmd/main.go
           if [ "$GITHUB_EVENT_NAME" == "release" ]; then
+            set -x
             mv main wrtcrd
             ASSET=wrtcrd-x64-osx.zip
             7za a -tzip $ASSET wrtcrd
@@ -57,6 +58,7 @@ jobs:
           echo "Windows"
           go build -tags "h264enc" cmd/main.go
           if [ "$GITHUB_EVENT_NAME" == "release" ]; then
+            set -x
             mv main.exe wrtcrd.exe
             ASSET=wrtcrd-x64-windows.zip
             7z a -tzip $ASSET wrtcrd.exe
