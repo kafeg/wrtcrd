@@ -29,7 +29,7 @@ jobs:
           echo "Linux"
           sudo apt-get install -y libxtst-dev p7zip-full gcc-multilib g++-multilib
           GOOS=linux GOARCH=amd64 go build -tags "h264enc" -v -ldflags="-X 'main.version=`git describe --tags --abbre v=0`'" -o wrtcrd cmd/main.go
-          wrtcrd --app-version
+          ./wrtcrd --app-version
           if [ "$GITHUB_EVENT_NAME" == "release" ]; then
             ASSET=wrtcrd-x64-linux.zip
             7za a -tzip $ASSET wrtcrd
@@ -51,7 +51,7 @@ jobs:
         run: |
           echo "macOS"
           GOOS=darwin GOARCH=amd64 go build -tags "h264enc" -v -ldflags="-X 'main.version=`git describe --tags --abbre v=0`'" -o wrtcrd cmd/main.go
-          wrtcrd --app-version
+          ./wrtcrd --app-version
           if [ "$GITHUB_EVENT_NAME" == "release" ]; then
             ASSET=wrtcrd-x64-osx.zip
             7za a -tzip $ASSET wrtcrd
@@ -74,7 +74,7 @@ jobs:
           # x64
           echo "Windows"
           GOOS=windows GOARCH=amd64 go build -tags "h264enc" -v -ldflags="-X 'main.version=`git describe --tags --abbre v=0`'" -o wrtcrd.exe cmd/main.go
-          wrtcrd.exe --app-version
+          ./wrtcrd.exe --app-version
           if [ "$GITHUB_EVENT_NAME" == "release" ]; then
             ASSET=wrtcrd-x64-windows.zip
             7z a -tzip $ASSET wrtcrd.exe
