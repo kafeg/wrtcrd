@@ -59,7 +59,7 @@ func main() {
 	inFileName := flag.String("in", defaultInFileName, "Input data filename (in:)")
 	outFileName := flag.String("out", defaultOutFileName, "Output data filename (out:)")
 	logFileName := flag.String("log", defaultLogFileName, "Log filename (log:)")
-	showAppVersion := flag.Bool("app-vesrion", false, "App version (app-version:)")
+	showAppVersion := flag.Bool("app-version", false, "App version (app-version:)")
 	flag.Parse()
 
 	if *showAppVersion {
