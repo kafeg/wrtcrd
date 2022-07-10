@@ -63,7 +63,7 @@ func main() {
 	flag.Parse()
 
 	if *showAppVersion {
-		log.Println(version)
+		fmt.Println(version)
 		return
 	}
 
