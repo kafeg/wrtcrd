@@ -25,6 +25,8 @@ const (
 	defaultLogFileName = "wrtcrd.log"
 )
 
+var version = ""
+
 type InputFileData struct {
 	Offer  string `json:"offer"`
 	Screen int    `json:"screen"`
@@ -57,7 +59,13 @@ func main() {
 	inFileName := flag.String("in", defaultInFileName, "Input data filename (in:)")
 	outFileName := flag.String("out", defaultOutFileName, "Output data filename (out:)")
 	logFileName := flag.String("log", defaultLogFileName, "Log filename (log:)")
+	showAppVersion := flag.Bool("app-vesrion", false, "App version (app-version:)")
 	flag.Parse()
+
+	if *showAppVersion {
+		log.Println(version)
+		return
+	}
 
 	// setup log output to log file
 	f, err := os.OpenFile(*logFileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
@@ -71,7 +79,7 @@ func main() {
 
 	dt := time.Now()
 	log.Println("")
-	log.Printf("Started: %s, Stun: %s, In: %s, Out: %s\n", dt.Format(time.RFC3339), *stunServer, *inFileName, *outFileName)
+	log.Printf("Started: %s, Version: %s, Stun: %s, In: %s, Out: %s\n", dt.Format(time.RFC3339), version, *stunServer, *inFileName, *outFileName)
 	log.Println("Init video provider and encoders")
 
 	// setup major services
