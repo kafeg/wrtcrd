@@ -71,7 +71,7 @@ func main() {
 
 	dt := time.Now()
 	log.Println("")
-	log.Printf("Started: %s, Stun: %s, In: %s, Out: %s\n", dt.String(), *stunServer, *inFileName, *outFileName)
+	log.Printf("Started: %s, Stun: %s, In: %s, Out: %s\n", dt.Format(time.RFC3339), *stunServer, *inFileName, *outFileName)
 	log.Println("Init video provider and encoders")
 
 	// setup major services
