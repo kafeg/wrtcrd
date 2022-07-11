@@ -1,4 +1,4 @@
-module github.com/kafeg/wrtc-rd-agent
+module github.com/kafeg/wrtcrd
 
 go 1.16
 

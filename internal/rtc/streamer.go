@@ -4,8 +4,8 @@ import (
 	"image"
 	"log"
 
-	"github.com/kafeg/wrtc-rd-agent/internal/encoders"
-	"github.com/kafeg/wrtc-rd-agent/internal/rdisplay"
+	"github.com/kafeg/wrtcrd/internal/encoders"
+	"github.com/kafeg/wrtcrd/internal/rdisplay"
 	"github.com/nfnt/resize"
 	"github.com/pion/webrtc/v2"
 	"github.com/pion/webrtc/v2/pkg/media"

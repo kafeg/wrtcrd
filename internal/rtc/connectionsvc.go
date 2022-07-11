@@ -3,8 +3,8 @@ package rtc
 import (
 	"fmt"
 
-	"github.com/kafeg/wrtc-rd-agent/internal/encoders"
-	"github.com/kafeg/wrtc-rd-agent/internal/rdisplay"
+	"github.com/kafeg/wrtcrd/internal/encoders"
+	"github.com/kafeg/wrtcrd/internal/rdisplay"
 )
 
 // RemoteScreenService is our implementation of the rtc.Service
