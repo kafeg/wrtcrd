@@ -67,6 +67,8 @@ func main() {
 		return
 	}
 
+	os.Remove(*outFileName)
+
 	// setup log output to log file
 	f, err := os.OpenFile(*logFileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
