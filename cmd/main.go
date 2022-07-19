@@ -55,28 +55,55 @@ func readInputFile(filePath string) (InputFileData, error) {
 
 func main() {
 	// parse args
-	stunServer := flag.String("stun", defaultStunServer, "STUN server URL (stun:)")
-	inFileName := flag.String("in", defaultInFileName, "Input data filename (in:)")
-	outFileName := flag.String("out", defaultOutFileName, "Output data filename (out:)")
-	logFileName := flag.String("log", defaultLogFileName, "Log filename (log:)")
-	showAppVersion := flag.Bool("app-version", false, "App version (app-version:)")
+	stunServerArg := flag.String("stun", defaultStunServer, "STUN server URL (stun:)")
+	inFileNameArg := flag.String("in", defaultInFileName, "Input data filename (in:)")
+	outFileNameArg := flag.String("out", defaultOutFileName, "Output data filename (out:)")
+	logFileNameArg := flag.String("log", defaultLogFileName, "Log filename (log:)")
+	showAppVersionArg := flag.Bool("app-version", false, "App version (app-version:)")
 	flag.Parse()
 
-	if *showAppVersion {
+	stunServer := *stunServerArg
+	inFileName := *inFileNameArg
+	outFileName := *outFileNameArg
+	logFileName := *logFileNameArg
+
+	if *showAppVersionArg {
 		fmt.Println(version)
 		return
 	}
 
-	os.Remove(*outFileName)
+	// alternate parameters (override arguments, for e.g. usable when can't pass args directly)
+	val, exists := os.LookupEnv("WRD_STUN")
+	if exists {
+		stunServer = val
+	}
+
+	val, exists = os.LookupEnv("WRD_IN")
+	if exists {
+		inFileName = val
+	}
+
+	val, exists = os.LookupEnv("WRD_OUT")
+	if exists {
+		outFileName = val
+	}
+
+	val, exists = os.LookupEnv("WRD_LOG")
+	if exists {
+		logFileName = val
+	}
+
+	// remove old data
+	os.Remove(outFileName)
 
 	// setup log output to log file
-	f, err := os.OpenFile(*logFileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile(logFileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)
 	}
 	defer f.Close()
 
-	log.Printf("Log to: %s\n", *logFileName)
+	log.Printf("Log to: %s\n", logFileName)
 	log.SetOutput(f)
 
 	dt := time.Now()
@@ -101,14 +128,14 @@ func main() {
 
 	// parse input file
 	log.Println("Read input data")
-	inputData, err := readInputFile(*inFileName)
+	inputData, err := readInputFile(inFileName)
 	if err != nil {
 		log.Fatalf("Can't open input file: %v", err)
 	}
 
 	log.Println("Process WebRTC offer")
 	var webrtc rtc.Service
-	webrtc = rtc.NewRemoteScreenService(*stunServer, video, enc)
+	webrtc = rtc.NewRemoteScreenService(stunServer, video, enc)
 
 	//read offer and create answer
 	peer, err := webrtc.CreateRemoteScreenConnection(inputData.Screen, 24)
@@ -131,10 +158,10 @@ func main() {
 	}
 
 	// write output file
-	if *outFileName == "stdout" {
+	if outFileName == "stdout" {
 		log.Println(string(outputData))
 	} else {
-		_ = ioutil.WriteFile(*outFileName, outputData, 0644)
+		_ = ioutil.WriteFile(outFileName, outputData, 0644)
 	}
 
 	// here we already have webrtc which is trying to connect using our OFFER in IN file
